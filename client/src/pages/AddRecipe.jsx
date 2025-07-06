@@ -1,6 +1,17 @@
 import React from 'react';
 
 function AddRecipe({ form, handleChange, handleSubmit }) {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      handleChange({ target: { name: 'image', value: reader.result } });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div style={{
       width: '100vw',
@@ -27,6 +38,10 @@ function AddRecipe({ form, handleChange, handleSubmit }) {
           <input name="cuisine" placeholder="Cuisine" value={form.cuisine} onChange={handleChange} />
           <textarea name="ingredients" placeholder="Ingredients (comma separated)" value={form.ingredients} onChange={handleChange} required />
           <textarea name="instructions" placeholder="Instructions" value={form.instructions} onChange={handleChange} required />
+          
+          {/* ✅ Image Upload Field */}
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+
           <button type="submit">Add Recipe</button>
         </form>
       </div>
@@ -35,3 +50,4 @@ function AddRecipe({ form, handleChange, handleSubmit }) {
 }
 
 export default AddRecipe;
+

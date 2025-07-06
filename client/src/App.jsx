@@ -9,7 +9,8 @@ function App() {
     title: '',
     cuisine: '',
     ingredients: '',
-    instructions: ''
+    instructions: '',
+    image: ''
   });
 
   useEffect(() => {
