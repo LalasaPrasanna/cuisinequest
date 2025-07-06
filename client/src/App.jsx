@@ -1,4 +1,7 @@
+import { Routes, Route, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import AddRecipe from './pages/AddRecipe';
+import RecipeList from './pages/RecipeList';
 
 function App() {
   const [recipes, setRecipes] = useState([]);
@@ -13,7 +16,7 @@ function App() {
     fetch('http://localhost:5000/api/recipes')
       .then(res => res.json())
       .then(data => setRecipes(data))
-      .catch(err => console.error('Error fetching recipes:', err));
+      .catch(err => console.error('Error:', err));
   }, []);
 
   const handleChange = (e) => {
@@ -39,66 +42,19 @@ function App() {
     setForm({ title: '', cuisine: '', ingredients: '', instructions: '' });
   };
 
-return (
-  <div style={{
-    width: '100vw',
-    minHeight: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    gap: '2rem',
-    padding: '2rem',
-    backgroundColor: '#121212',
-    color: 'white',
-    fontFamily: 'Arial, sans-serif',
-    boxSizing: 'border-box',
-    overflowX: 'hidden'
-  }}>
-    {/* Left: Add Recipe Form */}
-    <div style={{
-      flex: '1',
-      maxWidth: '400px',
-      padding: '1rem',
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      backgroundColor: '#1f1f1f',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-    }}>
-      <h2 style={{ textAlign: 'center' }}>Add a Recipe</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <input name="title" placeholder="Title" value={form.title} onChange={handleChange} required />
-        <input name="cuisine" placeholder="Cuisine" value={form.cuisine} onChange={handleChange} />
-        <textarea name="ingredients" placeholder="Ingredients (comma separated)" value={form.ingredients} onChange={handleChange} required />
-        <textarea name="instructions" placeholder="Instructions" value={form.instructions} onChange={handleChange} required />
-        <button type="submit">Add Recipe</button>
-      </form>
-    </div>
+  return (
+    <div style={{ backgroundColor: '#121212', minHeight: '100vh', padding: '1rem' }}>
+      <nav style={{ marginBottom: '2rem', textAlign: 'center' }}>
+        <Link to="/" style={{ margin: '0 1rem', color: 'lightblue', textDecoration: 'none' }}>Recipes</Link>
+        <Link to="/add" style={{ margin: '0 1rem', color: 'lightblue', textDecoration: 'none' }}>Add Recipe</Link>
+      </nav>
 
-    {/* Right: Recipe List */}
-    <div style={{ flex: '2', maxWidth: '700px' }}>
-      <h2>🌍 World Recipes</h2>
-      {recipes.length === 0 ? (
-        <p>No recipes yet.</p>
-      ) : (
-        recipes.map((r) => (
-          <div key={r._id} style={{
-            border: '1px solid #ccc',
-            padding: '1rem',
-            marginBottom: '1rem',
-            backgroundColor: '#1f1f1f',
-            borderRadius: '6px'
-          }}>
-            <h3>{r.title}</h3>
-            <p><strong>Cuisine:</strong> {r.cuisine}</p>
-            <p><strong>Ingredients:</strong> {r.ingredients.join(', ')}</p>
-            <p><strong>Instructions:</strong> {r.instructions}</p>
-          </div>
-        ))
-      )}
+      <Routes>
+        <Route path="/" element={<RecipeList recipes={recipes} />} />
+        <Route path="/add" element={<AddRecipe form={form} handleChange={handleChange} handleSubmit={handleSubmit} />} />
+      </Routes>
     </div>
-  </div>
-);
-
+  );
 }
 
 export default App;
