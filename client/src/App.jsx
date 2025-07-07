@@ -14,9 +14,17 @@ function App() {
     instructions: '',
     image: ''
   });
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
+  // 🔐 Check if user is already logged in (token exists)
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) setIsLoggedIn(true);
+  }, []);
+
+  // 📥 Fetch recipes if logged in
   useEffect(() => {
     if (isLoggedIn) {
       fetch('http://localhost:5000/api/recipes')
@@ -26,6 +34,13 @@ function App() {
     }
   }, [isLoggedIn]);
 
+  // 🧠 Handle login success from <Login />
+  const handleLogin = (status) => {
+    setIsLoggedIn(status);
+    if (status) navigate('/recipes');
+  };
+
+  // 🧾 Handle input change
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'image' && files.length > 0) {
@@ -39,8 +54,11 @@ function App() {
     }
   };
 
+  // 📨 Submit new recipe with JWT token
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('token');
+
     const newRecipe = {
       ...form,
       ingredients: form.ingredients.split(',').map(i => i.trim())
@@ -48,7 +66,10 @@ function App() {
 
     const res = await fetch('http://localhost:5000/api/recipes', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(newRecipe)
     });
 
@@ -58,22 +79,27 @@ function App() {
     navigate('/recipes');
   };
 
-  const handleLogin = (status) => {
-    setIsLoggedIn(status);
-    if (status) navigate('/recipes');
-  };
-
   return (
     <div style={{ backgroundColor: '#121212', minHeight: '100vh', padding: '1rem' }}>
       <nav style={{ marginBottom: '2rem', textAlign: 'center' }}>
         <Link to="/" style={{ margin: '0 1rem', color: 'lightblue' }}>Home</Link>
-        {isLoggedIn && (
+
+        {isLoggedIn ? (
           <>
             <Link to="/recipes" style={{ margin: '0 1rem', color: 'lightblue' }}>Recipes</Link>
             <Link to="/add" style={{ margin: '0 1rem', color: 'lightblue' }}>Add Recipe</Link>
+            <button
+              style={{ marginLeft: '1rem', color: 'lightblue', background: 'transparent', border: 'none', cursor: 'pointer' }}
+              onClick={() => {
+                localStorage.removeItem('token');
+                setIsLoggedIn(false);
+                navigate('/');
+              }}
+            >
+              Logout
+            </button>
           </>
-        )}
-        {!isLoggedIn && (
+        ) : (
           <Link to="/login" style={{ margin: '0 1rem', color: 'lightblue' }}>Login</Link>
         )}
       </nav>

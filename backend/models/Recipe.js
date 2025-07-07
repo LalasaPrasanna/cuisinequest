@@ -5,8 +5,11 @@ const recipeSchema = new mongoose.Schema({
   cuisine: String,
   ingredients: [String],
   instructions: String,
-   image: String,
-  createdAt: { type: Date, default: Date.now }
+  image: String,
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 });
 
 module.exports = mongoose.model('Recipe', recipeSchema);
