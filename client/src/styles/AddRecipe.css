@@ -1,0 +1,42 @@
+.add-page {
+  min-height: 100vh;
+  background-color: #121212;
+  color: white;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.add-form-container {
+  background-color: #1f1f1f;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.add-form input,
+.add-form textarea {
+  padding: 0.6rem;
+  border-radius: 4px;
+  border: none;
+}
+
+.add-form button {
+  padding: 0.6rem;
+  background-color: lightblue;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.preview {
+  max-width: 100%;
+  border-radius: 6px;
+}

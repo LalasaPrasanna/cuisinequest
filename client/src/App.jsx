@@ -1,5 +1,7 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import Home from './pages/Home';
+import Login from './pages/Login';
 import AddRecipe from './pages/AddRecipe';
 import RecipeList from './pages/RecipeList';
 
@@ -12,21 +14,33 @@ function App() {
     instructions: '',
     image: ''
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/recipes')
-      .then(res => res.json())
-      .then(data => setRecipes(data))
-      .catch(err => console.error('Error:', err));
-  }, []);
+    if (isLoggedIn) {
+      fetch('http://localhost:5000/api/recipes')
+        .then(res => res.json())
+        .then(data => setRecipes(data))
+        .catch(err => console.error('Error:', err));
+    }
+  }, [isLoggedIn]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === 'image' && files.length > 0) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm({ ...form, image: reader.result });
+      };
+      reader.readAsDataURL(files[0]);
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const newRecipe = {
       ...form,
       ingredients: form.ingredients.split(',').map(i => i.trim())
@@ -40,19 +54,35 @@ function App() {
 
     const saved = await res.json();
     setRecipes([...recipes, saved]);
-    setForm({ title: '', cuisine: '', ingredients: '', instructions: '' });
+    setForm({ title: '', cuisine: '', ingredients: '', instructions: '', image: '' });
+    navigate('/recipes');
+  };
+
+  const handleLogin = (status) => {
+    setIsLoggedIn(status);
+    if (status) navigate('/recipes');
   };
 
   return (
     <div style={{ backgroundColor: '#121212', minHeight: '100vh', padding: '1rem' }}>
       <nav style={{ marginBottom: '2rem', textAlign: 'center' }}>
-        <Link to="/" style={{ margin: '0 1rem', color: 'lightblue', textDecoration: 'none' }}>Recipes</Link>
-        <Link to="/add" style={{ margin: '0 1rem', color: 'lightblue', textDecoration: 'none' }}>Add Recipe</Link>
+        <Link to="/" style={{ margin: '0 1rem', color: 'lightblue' }}>Home</Link>
+        {isLoggedIn && (
+          <>
+            <Link to="/recipes" style={{ margin: '0 1rem', color: 'lightblue' }}>Recipes</Link>
+            <Link to="/add" style={{ margin: '0 1rem', color: 'lightblue' }}>Add Recipe</Link>
+          </>
+        )}
+        {!isLoggedIn && (
+          <Link to="/login" style={{ margin: '0 1rem', color: 'lightblue' }}>Login</Link>
+        )}
       </nav>
 
       <Routes>
-        <Route path="/" element={<RecipeList recipes={recipes} />} />
-        <Route path="/add" element={<AddRecipe form={form} handleChange={handleChange} handleSubmit={handleSubmit} />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/recipes" element={isLoggedIn ? <RecipeList recipes={recipes} /> : <Home />} />
+        <Route path="/add" element={isLoggedIn ? <AddRecipe form={form} handleChange={handleChange} handleSubmit={handleSubmit} /> : <Home />} />
       </Routes>
     </div>
   );
