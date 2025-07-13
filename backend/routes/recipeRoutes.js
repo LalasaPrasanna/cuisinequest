@@ -1,24 +1,21 @@
-const express = require('express');
+const router = require('express').Router();
 const Recipe = require('../models/Recipe');
-const auth = require('../utils/authMiddleware');
+const upload = require('../utils/cloudinary');
+const { protect } = require('../utils/authMiddleware');
 
-const router = express.Router();
-
-// Get all recipes
-router.get('/', async (req, res) => {
-  const recipes = await Recipe.find();
+router.get('/', protect, async (req, res) => {
+  const recipes = await Recipe.find().sort({ createdAt: -1 });
   res.json(recipes);
 });
 
-// Add recipe (protected)
-router.post('/', auth, async (req, res) => {
-  try {
-    const recipe = new Recipe({ ...req.body, createdBy: req.user.id });
-    const saved = await recipe.save();
-    res.json(saved);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to save recipe' });
-  }
+router.post('/', protect, upload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Image required' });
+  const { title, origin, ingredients, instructions } = req.body;
+  const newR = await Recipe.create({
+    title, origin, ingredients: ingredients.split(',').map(i => i.trim()),
+    instructions, image: req.file.path, createdBy: req.user._id
+  });
+  res.status(201).json(newR);
 });
 
 module.exports = router;

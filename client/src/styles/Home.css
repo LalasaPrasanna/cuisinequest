@@ -1,23 +1,25 @@
-.home-background {
-  position: relative;
-  background-image: url('/images/home.jpg'); /* your image path */
+.home {
+  height: calc(100vh - 60px);
   background-size: cover;
   background-position: center;
-  height: 100vh;
+  background-repeat: no-repeat;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 1px 1px 5px #000;
+  padding: 20px;
+  text-align: center;
 }
 
-.home-text-overlay {
-  position: absolute;
-  top: 70%;      /* Adjust to match phone position */
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  padding: 1.0rem 1rem;
-  border-radius: 12px;
-  color: #b0abab;
-  text-align: center;
-  max-width: 500px;
-  font-size: 1.2rem;
-  box-shadow: 0 0 10px rgba(18, 18, 18, 0.4),;
+.home h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.home p {
+  font-size: 22px;
+  max-width: 600px;
+  margin: 0 auto;
 }
