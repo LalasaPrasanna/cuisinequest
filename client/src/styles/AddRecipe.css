@@ -1,39 +1,53 @@
-.addrecipe {
+.add-recipe-container {
   max-width: 600px;
-  margin: 40px auto;
-  padding: 25px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.addrecipe h2 {
+  margin: 50px auto;
+  padding: 20px;
   text-align: center;
-  margin-bottom: 20px;
 }
 
-.addrecipe form {
+.add-recipe-container form {
   display: flex;
   flex-direction: column;
+  gap: 15px;
 }
 
-.addrecipe input,
-.addrecipe textarea {
-  margin-bottom: 12px;
+.add-recipe-container input,
+.add-recipe-container textarea {
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 8px;
   border: 1px solid #ccc;
+  width: 100%;
 }
 
-.addrecipe button {
-  background-color: #007bff;
+.add-recipe-container button {
+  padding: 10px;
+  background-color: #43a047;
   color: white;
-  padding: 12px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.addrecipe button:hover {
-  background-color: #0056b3;
+.add-recipe-container button:hover {
+  background-color: #2e7d32;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #fff;
+  background-color: #039be5;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.nav-links a:hover {
+  background-color: #0277bd;
 }

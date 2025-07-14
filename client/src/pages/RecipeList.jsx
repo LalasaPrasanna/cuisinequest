@@ -1,22 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-export default function RecipeList() {
-  const [list, setList] = useState([]);
-  useEffect(() => axios.get('http://localhost:5000/api/recipes', {
-    headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user')).token}` }
-  }).then(r => setList(r.data)), []);
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "../styles/RecipeList.css";
+
+export default function RecipeList({ user }) {
+  const [recipes, setRecipes] = useState([]);
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("/api/recipes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setRecipes(res.data);
+      } catch (error) {
+        console.error("Failed to fetch recipes");
+      }
+    };
+
+    fetchRecipes();
+  }, []);
 
   return (
-    <div className="list">
-      {list.map(r => (
-        <div className="card" key={r._id}>
-          <img src={r.image} alt={r.title} />
-          <h3>{r.title}</h3>
-          <p><strong>Origin:</strong> {r.origin}</p>
-          <p><strong>Ingredients:</strong> {r.ingredients.join(', ')}</p>
-          <p><strong>Instructions:</strong> {r.instructions}</p>
-        </div>
-      ))}
+    <div className="recipe-list-container">
+      <h2>Recipe List</h2>
+      <div className="recipe-list-links">
+        <a href="/add">Add Recipe</a>
+        <a href="/">Home</a>
+        <a href="/" onClick={() => localStorage.removeItem("token")}>Logout</a>
+      </div>
+      <div className="recipes">
+        {recipes.length === 0 ? (
+          <p>No recipes found.</p>
+        ) : (
+          recipes.map((recipe, index) => (
+            <div className="recipe-card" key={index}>
+              <img src={recipe.imageUrl} alt={recipe.name} />
+              <h3>{recipe.name}</h3>
+              <p><strong>Cuisine:</strong> {recipe.origin}</p>
+              <p><strong>Ingredients:</strong> {recipe.ingredients}</p>
+              <p><strong>Instructions:</strong> {recipe.instructions}</p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

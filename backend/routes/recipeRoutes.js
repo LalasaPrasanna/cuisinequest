@@ -1,21 +1,51 @@
-const router = require('express').Router();
-const Recipe = require('../models/Recipe');
-const upload = require('../utils/cloudinary');
-const { protect } = require('../utils/authMiddleware');
+const express = require("express");
+const multer = require("multer");
+const cloudinary = require("../utils/cloudinary");
+const authenticateToken = require("../utils/authMiddleware");
+const Recipe = require("../models/Recipe"); // Mongoose model
 
-router.get('/', protect, async (req, res) => {
-  const recipes = await Recipe.find().sort({ createdAt: -1 });
-  res.json(recipes);
+const router = express.Router();
+
+// Multer setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) =>
+    cb(null, require("crypto").randomBytes(16).toString("hex"))
+});
+const upload = multer({ storage });
+
+// ✅ POST /api/recipes – Add a recipe
+router.post("/", authenticateToken, upload.single("image"), async (req, res) => {
+  try {
+    const { name, origin, ingredients, instructions } = req.body;
+
+    const result = await cloudinary.uploader.upload(req.file.path);
+
+    const recipe = new Recipe({
+      name,
+      origin,
+      ingredients,
+      instructions,
+      imageUrl: result.secure_url
+    });
+
+    await recipe.save(); // ✅ use mongoose model
+    res.status(201).json({ message: "Recipe added successfully" });
+  } catch (err) {
+    console.error("❌ Upload error:", err);
+    res.status(500).json({ message: "Failed to add recipe" });
+  }
 });
 
-router.post('/', protect, upload.single('image'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'Image required' });
-  const { title, origin, ingredients, instructions } = req.body;
-  const newR = await Recipe.create({
-    title, origin, ingredients: ingredients.split(',').map(i => i.trim()),
-    instructions, image: req.file.path, createdBy: req.user._id
-  });
-  res.status(201).json(newR);
+// ✅ GET /api/recipes – Fetch all recipes
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const recipes = await Recipe.find(); // ✅ use mongoose model
+    res.json(recipes);
+  } catch (err) {
+    console.error("❌ Fetch error:", err);
+    res.status(500).json({ message: "Failed to fetch recipes" });
+  }
 });
 
 module.exports = router;

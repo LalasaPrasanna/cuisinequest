@@ -1,75 +1,60 @@
-// client/src/pages/AddRecipe.jsx
+import React, { useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import "../styles/AddRecipe.css";
 
-import React, { useState } from 'react';
-import axios from 'axios';
-import '../styles/AddRecipe.css';
-
-const AddRecipe = () => {
+export default function AddRecipe() {
   const [formData, setFormData] = useState({
-    title: '',
-    cuisine: '',
-    origin: '',
-    ingredients: '',
-    instructions: '',
-    image: null,
+    name: "",
+    origin: "",
+    ingredients: "",
+    instructions: "",
+    image: null
   });
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData({
-      ...formData,
-      [name]: files ? files[0] : value,
-    });
+  const handleChange = e => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleImage = e => {
+    setFormData({ ...formData, image: e.target.files[0] });
+  };
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.token) {
-      alert("You must be logged in");
-      return;
-    }
+    const token = localStorage.getItem("token");
+    const data = new FormData();
+    Object.keys(formData).forEach(key => {
+      data.append(key, formData[key]);
+    });
 
     try {
-      const form = new FormData();
-      form.append('title', formData.title);
-      form.append('cuisine', formData.cuisine);
-      form.append('origin', formData.origin);
-      form.append('ingredients', formData.ingredients);
-      form.append('instructions', formData.instructions);
-      form.append('image', formData.image);
-
-      const res = await axios.post('http://localhost:5000/api/recipes', form, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${user.token}`
-        }
+      await axios.post("/api/recipes", data, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-
-      if (res.status === 201) {
-        alert("Recipe added successfully!");
-        window.location.href = '/recipes';
-      }
+      alert("Recipe added!");
+      navigate("/recipes");
     } catch (err) {
-      console.error(err);
-      alert("Something went wrong!");
+      alert("Failed to add recipe. " + (err.response?.data?.message || ""));
     }
   };
 
   return (
-    <div className="addrecipe">
-      <h2>Add a New Recipe</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" name="title" placeholder="Recipe Title" onChange={handleChange} required />
-        <input type="text" name="cuisine" placeholder="Cuisine Type" onChange={handleChange} required />
-        <input type="text" name="origin" placeholder="Place of Origin" onChange={handleChange} required />
-        <textarea name="ingredients" placeholder="Ingredients (comma separated)" onChange={handleChange} required />
+    <div className="add-recipe-container">
+      <div className="nav-links">
+        <Link to="/">Home</Link>
+        <Link to="/recipes">Recipe List</Link>
+      </div>
+      <h2>Add Recipe</h2>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <input name="name" placeholder="Name" onChange={handleChange} required />
+        <input name="origin" placeholder="Cuisine" onChange={handleChange} required />
+        <textarea name="ingredients" placeholder="Ingredients" onChange={handleChange} required />
         <textarea name="instructions" placeholder="Instructions" onChange={handleChange} required />
-        <input type="file" name="image" accept="image/*" onChange={handleChange} required />
+        <input type="file" name="image" onChange={handleImage} required />
         <button type="submit">Add Recipe</button>
       </form>
     </div>
   );
-};
-
-export default AddRecipe;
+}

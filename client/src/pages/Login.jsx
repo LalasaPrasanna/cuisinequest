@@ -1,30 +1,71 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-export default function Login({ setUser }) {
-  const [isReg, setIsReg] = useState(false);
-  const [data, setData] = useState({ name: '', email: '', password: '' });
-  const nav = useNavigate();
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "../styles/Login.css";
 
-  const submit = async e => {
+export default function Login({ setUser }) {
+  const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const navigate = useNavigate();
+
+  const handleChange = e => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    const url = `http://localhost:5000/api/users/${isReg ? 'register' : 'login'}`;
-    const { data: res } = await axios.post(url, data);
-    localStorage.setItem('user', JSON.stringify(res));
-    setUser(res);
-    nav('/');
+    const url = isLogin ? "/api/users/login" : "/api/users/register";
+    try {
+      const response = await axios.post(url, formData);
+      if (isLogin) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        setUser(response.data.user);
+        navigate("/");
+      } else {
+        alert("Registered! Please log in.");
+        setIsLogin(true);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Error occurred");
+    }
   };
 
   return (
-    <div className="login">
-      <h2>{isReg ? 'Register' : 'Login'}</h2>
-      <form onSubmit={submit}>
-        {isReg && <input name="name" value={data.name} onChange={e => setData({ ...data, name: e.target.value })} placeholder="Name" required />}
-        <input name="email" type="email" value={data.email} onChange={e => setData({ ...data, email: e.target.value })} placeholder="Email" required />
-        <input name="password" type="password" value={data.password} onChange={e => setData({ ...data, password: e.target.value })} placeholder="Password" required />
-        <button type="submit">{isReg ? 'Register' : 'Login'}</button>
+    <div className="login-container">
+      <h2>{isLogin ? "Login" : "Register"}</h2>
+      <form onSubmit={handleSubmit}>
+        {!isLogin && (
+          <input
+            type="text"
+            name="name"
+            placeholder="Name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        )}
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+        <button type="submit">{isLogin ? "Login" : "Register"}</button>
       </form>
-      <p onClick={() => setIsReg(!isReg)}>{isReg ? 'Login here' : 'Register here'}</p>
+      <p onClick={() => setIsLogin(!isLogin)}>
+        {isLogin ? "New user? Register here." : "Already have an account? Login"}
+      </p>
     </div>
   );
 }
