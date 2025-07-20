@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Debug log for env variableconst
-testURI = 'mongodb+srv://cuisineuser:cuisinequest@cluster0.thbil9i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+testURI =process.env.MONGODB_URI;
 console.log('Connecting to:', testURI);
 mongoose.connect(testURI, {
 
