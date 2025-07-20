@@ -1,5 +1,5 @@
 .home-container {
-  background-image: url("images/home.jpg"); /* Adjust path if needed */
+  background-image: url("images/home.jpg"); 
   background-size: cover;
   background-position: center;
   height: 100vh;
@@ -9,7 +9,7 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Top center navigation buttons */
+
 .home-buttons {
   position: absolute;
   top: 40px;
@@ -38,7 +38,6 @@
   background-color: #1976D2;
 }
 
-/* Centered text: Hello name first, then Welcome */
 .home-container h1 {
   position: absolute;
   top: 50%;
