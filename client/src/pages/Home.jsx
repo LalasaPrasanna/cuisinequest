@@ -21,10 +21,10 @@ export default function Home({ user, onLogout }) {
       {user ? (
         <>
           <h1>Hello {user.name}!</h1>
-          <h2>Welcome to Cuisine Quest</h2>
+          <h2>Welcome to Cuisine Quest :)</h2>
         </>
       ) : (
-        <h2>Welcome to Cuisine Quest</h2>
+        <h2>Welcome to Cuisine Quest :)</h2>
       )}
     </div>
   );
