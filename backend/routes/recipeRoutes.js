@@ -1,0 +1,47 @@
+const express = require("express");
+const multer = require("multer");
+const cloudinary = require("../utils/cloudinary");
+const authenticateToken = require("../utils/authMiddleware");
+const Recipe = require("../models/Recipe"); 
+
+const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) =>
+    cb(null, require("crypto").randomBytes(16).toString("hex"))
+});
+const upload = multer({ storage });
+router.post("/", authenticateToken, upload.single("image"), async (req, res) => {
+  try {
+    const { name, origin, ingredients, instructions } = req.body;
+
+    const result = await cloudinary.uploader.upload(req.file.path);
+
+    const recipe = new Recipe({
+      name,
+      origin,
+      ingredients,
+      instructions,
+      imageUrl: result.secure_url
+    });
+
+    await recipe.save(); 
+    res.status(201).json({ message: "Recipe added successfully" });
+  } catch (err) {
+    console.error(" Upload error:", err);
+    res.status(500).json({ message: "Failed to add recipe" });
+  }
+});
+
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const recipes = await Recipe.find(); 
+    res.json(recipes);
+  } catch (err) {
+    console.error(" Fetch error:", err);
+    res.status(500).json({ message: "Failed to fetch recipes" });
+  }
+});
+
+module.exports = router;
