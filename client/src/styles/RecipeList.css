@@ -6,17 +6,20 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Title */
 .recipe-list-container h2 {
   font-size: 2rem;
   margin-bottom: 20px;
   color: #2c3e50;
 }
 
+/* --- NAVIGATION LINKS (TOP) --- */
 .recipe-list-links {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;   /* ensures filter stays below */
+  margin-top: 10px;
 }
 
 .recipe-list-links a {
@@ -32,19 +35,55 @@
   background-color: #2980b9;
 }
 
+/* --- FILTER SECTION (BELOW NAVIGATION) --- */
+.filter-container {
+  margin-bottom: 30px;
+  margin-top: 10px; /* spacing below nav */
+}
+
+.filter-container label {
+  margin-right: 10px;
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.filter-container select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #3498db;
+  outline: none;
+  font-size: 1rem;
+  background-color: #f8f9fa;
+  transition: border-color 0.3s ease;
+}
+
+.filter-container select:hover,
+.filter-container select:focus {
+  border-color: #2980b9;
+}
+
+/* --- RECIPE GRID --- */
 .recipes {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 25px;
 }
 
+/* --- RECIPE CARDS --- */
 .recipe-card {
-  background: #ffffff;
-  border: 1px solid #e1e1e1;
+  background: #96c0da;
+  border: 1px solid #e6f894;
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
 
 .recipe-card img {
@@ -57,6 +96,7 @@
 .recipe-card h3 {
   margin-top: 12px;
   color: #2c3e50;
+  font-size: 1.2rem;
 }
 
 .recipe-card p {
